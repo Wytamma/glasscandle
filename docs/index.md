@@ -1,6 +1,3 @@
----
-title: Home
----
 
 ![](https://raw.githubusercontent.com/Wytamma/glasscandle/refs/heads/main/docs/images/logo.png)
 
@@ -8,6 +5,10 @@ A flexible, modular version monitoring tool that tracks changes across multiple 
 
 [![PyPI - Version](https://img.shields.io/pypi/v/glasscandle.svg)](https://pypi.org/project/glasscandle)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/glasscandle.svg)](https://pypi.org/project/glasscandle)
+[![write-the - docs](https://badgen.net/badge/write-the/docs/blue?icon=https://raw.githubusercontent.com/Wytamma/write-the/master/images/write-the-icon.svg)](https://write-the.wytamma.com/)
+[![write-the - test](https://badgen.net/badge/write-the/tests/green?icon=https://raw.githubusercontent.com/Wytamma/write-the/master/images/write-the-icon.svg)](https://github.com/Wytamma/glasscandle/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/Wytamma/glasscandle/branch/master/graph/badge.svg?token=yEDn56L76k)](https://app.codecov.io/gh/Wytamma/glasscandle/tree/master)
+
 
 -----
 
@@ -173,13 +174,13 @@ multi_notify = multi_notifier(slack_notify, email_notify)
 watch.json("https://api.github.com/repos/user/repo/releases/latest", 
            "$.tag_name", on_change=multi_notify)
 
-# Direct notification function calls
-from glasscandle.notifications.slack import send_slack_msg
+# Direct external function calls
+from glasscandle.external.slack import send_slack_msg
 import os
 
 def custom_notifier(key: str, old: str, new: str):
     webhook_url = os.getenv("SLACK_WEBHOOK_URL")
-    send_slack_msg(webhook_url, f"Version Update: {key}", f"Updated from {old} → {new}")
+    send_slack_msg(f"Version Update: {key}", f"Updated from {old} → {new}", webhook_url=webhook_url)
 
 watch.pypi("requests", on_change=custom_notifier)
 ```
@@ -217,13 +218,12 @@ jobs:
     - run: python watch_script.py
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        EMAIL_TO: ${{ secrets.EMAIL_TO }}
     - run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add versions.json || true
+        git add .
         git diff --staged --quiet || git commit -m "Update versions [skip ci]"
-        git push || true
+        git push
 ```
 
 ### 3. Watch Script
@@ -293,39 +293,6 @@ watch.json("https://api.github.com/repos/user/repo/releases/latest", "$.tag_name
 watch.start(interval=300)
 ```
 
-## Architecture
-
-Watcher uses a modular architecture for maintainability and extensibility:
-
-```
-src/watcher/
-├── watcher.py          # Main Watcher class
-├── db.py              # JSON database abstraction
-├── http.py            # HTTP session management
-├── parsers.py         # Response parsing functions
-├── pool.py            # Provider collection management
-└── providers/         # Provider implementations
-    ├── base.py        # Provider protocol
-    ├── pypi.py        # PyPI provider
-    ├── bioconda.py    # Bioconda provider
-    └── url.py         # Generic URL provider
-```
-
-This modular design allows for:
-- Easy addition of new providers
-- Independent testing of components
-- Clear separation of concerns
-- Flexible parser composition
-
-For detailed architecture information, see [ARCHITECTURE.md](ARCHITECTURE.md).
-
-## Development
-
-Install [hatch](https://github.com/pypa/hatch).
-
-```console
-hatch run test
-```
 
 ## License
 

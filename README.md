@@ -180,7 +180,7 @@ import os
 
 def custom_notifier(key: str, old: str, new: str):
     webhook_url = os.getenv("SLACK_WEBHOOK_URL")
-    send_slack_msg(webhook_url, f"Version Update: {key}", f"Updated from {old} → {new}")
+    send_slack_msg(f"Version Update: {key}", f"Updated from {old} → {new}", webhook_url=webhook_url)
 
 watch.pypi("requests", on_change=custom_notifier)
 ```
@@ -218,13 +218,12 @@ jobs:
     - run: python watch_script.py
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        EMAIL_TO: ${{ secrets.EMAIL_TO }}
     - run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add versions.json || true
+        git add .
         git diff --staged --quiet || git commit -m "Update versions [skip ci]"
-        git push || true
+        git push
 ```
 
 ### 3. Watch Script
@@ -294,44 +293,6 @@ watch.json("https://api.github.com/repos/user/repo/releases/latest", "$.tag_name
 watch.start(interval=300)
 ```
 
-## Architecture
-
-Watcher uses a modular architecture for maintainability and extensibility:
-
-```
-src/watcher/
-├── watcher.py          # Main Watcher class
-├── db.py              # JSON database abstraction
-├── http.py            # HTTP session management
-├── parsers.py         # Response parsing functions
-├── pool.py            # Provider collection management
-└── providers/         # Provider implementations
-    ├── base.py        # Provider protocol
-    ├── pypi.py        # PyPI provider
-    ├── bioconda.py    # Bioconda provider
-    └── url.py         # Generic URL provider
-```
-
-This modular design allows for:
-- Easy addition of new providers
-- Independent testing of components
-- Clear separation of concerns
-- Flexible parser composition
-
-For detailed architecture information, see [ARCHITECTURE.md](ARCHITECTURE.md).
-
-## Development
-
-```console
-# Install in development mode
-pip install -e .
-
-# Run the example
-python examples/watch.py
-
-# Run tests (if available)
-python -m pytest
-```
 
 ## License
 

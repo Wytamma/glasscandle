@@ -1,0 +1,13 @@
+*.pyc
+__pycache__/
+.env
+dist/
+site/
+.coverage
+test.py
+coverage.xml
+.DS_Store
+wizard/
+.mypy_cache/
+*.egg-info/
+.pytest_cache/

@@ -1,11 +1,13 @@
 name: GlassCandle
 on:
-  push:
-    branches: 
-      - master
-      - main
+  # push:
+  #   branches: 
+  #     - master
+  #     - main
   schedule:
       - cron: '0 0 * * *' # Run daily at midnight
+  workflow_dispatch: # Allow manual triggering
+
 
 jobs:
   glasscandle:

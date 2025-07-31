@@ -16,17 +16,19 @@ GitHub Actions allows you to run Watcher automatically in the cloud, making it p
 Create a file at `.github/workflows/watcher.yml` in your repository:
 
 ```yaml
-name: Watcher
+name: GlassCandle
 on:
-  push:
-    branches: 
-      - main
-      - master
+  # push:
+  #   branches: 
+  #     - master
+  #     - main
   schedule:
-    - cron: '0 0 * * *' # Run daily at midnight UTC
+      - cron: '0 0 * * *' # Run daily at midnight
+  workflow_dispatch: # Allow manual triggering
+
 
 jobs:
-  check:
+  glasscandle:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,19 +39,35 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Install glasscandle
+      - name: Install dependencies
         run: pip install glasscandle
       
-      - name: Run watcher
-        run: python your_watcher_script.py
+      - name: Run GlassCandle
+        env:
+          # Slack webhook URL stored as GitHub secret
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          # Email notifications (stored as secrets)
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_SMTP_SERVER: ${{ secrets.EMAIL_SMTP_SERVER }}
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          # Mastodon (stored as secrets)
+          MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+          MASTODON_API_BASE_URL: ${{ secrets.MASTODON_API_BASE_URL }}
+          # Bluesky (stored as secrets)
+          BSKY_USERNAME: ${{ secrets.BSKY_USERNAME }}
+          BSKY_PASSWORD: ${{ secrets.BSKY_PASSWORD }}
 
-      - name: Commit database changes
+        run: python examples/watch.py # Example script to run GlassCandle
+
+      - name: Commit and push version database changes
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add *.json || true
-          git diff --staged --quiet || git commit -m "Update watcher database [skip ci]"
-          git push || true
+          git config --local user.name "GlassCandle"
+          git add .
+          git diff --staged --quiet || git commit -m "Update version database [skip ci]"
+          git push
+
 ```
 
 ### 2. Create Your Watcher Script

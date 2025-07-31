@@ -34,5 +34,6 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: Wytamma/glasscandle
+          files: ./coverage.xml
 
 

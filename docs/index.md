@@ -7,7 +7,7 @@ A flexible, modular version monitoring tool that tracks changes across multiple 
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/glasscandle.svg)](https://pypi.org/project/glasscandle)
 [![write-the - docs](https://badgen.net/badge/write-the/docs/blue?icon=https://raw.githubusercontent.com/Wytamma/write-the/master/images/write-the-icon.svg)](https://write-the.wytamma.com/)
 [![write-the - test](https://badgen.net/badge/write-the/tests/green?icon=https://raw.githubusercontent.com/Wytamma/write-the/master/images/write-the-icon.svg)](https://github.com/Wytamma/glasscandle/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/Wytamma/glasscandle/branch/master/graph/badge.svg?token=yEDn56L76k)](https://app.codecov.io/gh/Wytamma/glasscandle/tree/master)
+[![codecov](https://codecov.io/gh/Wytamma/glasscandle/graph/badge.svg?token=J6tzIs9inI)](https://codecov.io/gh/Wytamma/glasscandle)
 
 
 -----

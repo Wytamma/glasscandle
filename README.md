@@ -19,8 +19,6 @@ A flexible, modular version monitoring tool that tracks changes across multiple 
 - [Quick Start](#quick-start)
 - [Supported Providers](#supported-providers)
 - [Usage Examples](#usage-examples)
-- [Architecture](#architecture)
-- [Development](#development)
 - [License](#license)
 
 ## Features

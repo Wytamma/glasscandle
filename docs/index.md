@@ -2,7 +2,7 @@
 title: Home
 ---
 
-![](docs/images/logo.png)
+![](https://raw.githubusercontent.com/Wytamma/glasscandle/refs/heads/main/docs/images/logo.png)
 
 A flexible, modular version monitoring tool that tracks changes across multiple sources including PyPI, Bioconda, and custom URLs.
 

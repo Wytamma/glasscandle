@@ -7,7 +7,7 @@ on:
       - cron: '0 0 * * *' # Run daily at midnight
 
 jobs:
-  check:
+  Check for new versions:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
 
       - run: pip install glasscandle
       
-      - name: Run glasscandle
+      - name: Run GlassCandle
         env:
           # Slack webhook URL stored as GitHub secret
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -44,6 +44,6 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add versions.json || true
+          git add .
           git diff --staged --quiet || git commit -m "Update version database [skip ci]"
-          git push || true
+          git push

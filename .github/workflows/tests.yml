@@ -1,0 +1,35 @@
+
+name: tests 
+on:
+  push:
+    branches:
+      - master 
+      - main
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        config:
+          - {os: ubuntu-latest}
+          # - {os: windows-latest}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - uses: actions/cache@v4
+        with:
+          key: ${{ github.ref }}
+          path: .cache
+      - run: pip install hatch
+      - run: hatch run cov
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+
+

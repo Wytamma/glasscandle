@@ -49,7 +49,7 @@ dependencies = [
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
-cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov-report xml {args:tests}"
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=src --cov-report xml {args:tests}"
 
 
 [[tool.hatch.envs.all.matrix]]

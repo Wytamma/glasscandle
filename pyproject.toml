@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "watcher"
+name = "glasscandle"
 dynamic = ["version"]
 description = ''
 readme = "README.md"
@@ -32,15 +32,13 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/unknown/watcher#readme"
-Issues = "https://github.com/unknown/watcher/issues"
-Source = "https://github.com/unknown/watcher"
+Documentation = "https://github.com/wytamma/glasscandle#readme"
+Issues = "https://github.com/wytamma/glasscandle/issues"
+Source = "https://github.com/wytamma/glasscandle"
 
-[project.scripts]
-watcher = "watcher.cli:watcher"
 
 [tool.hatch.version]
-path = "src/watcher/__about__.py"
+path = "src/glasscandle/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -69,19 +67,19 @@ dependencies = [
   "mypy>=1.0.0",
 ]
 [tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/watcher tests}"
+check = "mypy --install-types --non-interactive {args:src/glasscandle tests}"
 
 [tool.coverage.run]
-source_pkgs = ["watcher", "tests"]
+source_pkgs = ["glasscandle", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/watcher/__about__.py",
+  "src/glasscandle/__about__.py",
 ]
 
 [tool.coverage.paths]
-watcher = ["src/watcher", "*/watcher/src/watcher"]
-tests = ["tests", "*/watcher/tests"]
+glasscandle = ["src/glasscandle", "*/glasscandle/src/glasscandle"]
+tests = ["tests", "*/glasscandle/tests"]
 
 [tool.coverage.report]
 exclude_lines = [

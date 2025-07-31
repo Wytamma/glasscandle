@@ -42,22 +42,15 @@ path = "src/glasscandle/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
-  "coverage[toml]>=6.5",
+  "pytest-cov",
   "pytest",
   "pytest-mock",
   "requests-mock",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov-report xml {args:tests}"
+
 
 [[tool.hatch.envs.all.matrix]]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]

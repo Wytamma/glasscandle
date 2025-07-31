@@ -1,0 +1,60 @@
+
+site_name: GlassCandle Documentation
+repo_url: https://github.com/wytamma/glasscandle
+
+nav:
+  - Home: index.md
+  - Notifications: NOTIFICATIONS.md
+  - GitHub Actions: GITHUB_ACTIONS.md
+  - API Reference:
+    - Watcher: reference/watcher.md
+    - Database: reference/db.md
+    - HTTP: reference/http.md
+    - Parsers: reference/parsers.md
+    - Pool: reference/pool.md
+    - Providers: reference/providers.md
+    - Notifications: reference/notifications.md
+    - CLI: reference/cli.md
+    - Providers: reference/providers.md
+    - Notifications: reference/notifications.md
+
+theme:
+  name: "material"
+  # homepage: https://write-the.wytamma.com
+  # logo: assets/logo.png
+  # favicon: images/favicon.png
+  palette: 
+    - scheme: default
+      toggle:
+        icon: material/brightness-7 
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - toc.follow
+    - content.action.edit
+
+extra:
+  social:
+    - icon: fontawesome/solid/robot
+      link: https://github.com/Wytamma/write-the
+      name: Generated with write-the
+
+plugins:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          docstring_style: "google"
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

@@ -7,7 +7,7 @@ on:
       - cron: '0 0 * * *' # Run daily at midnight
 
 jobs:
-  Check for new versions:
+  glasscandle:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,7 +18,8 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - run: pip install glasscandle
+      - name: Install dependencies
+        run: pip install glasscandle
       
       - name: Run GlassCandle
         env:

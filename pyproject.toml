@@ -1,0 +1,91 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "watcher"
+dynamic = ["version"]
+description = ''
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Wytamma Wirth", email = "wytamma.wirth@me.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "click",
+  "requests",
+  "beautifulsoup4",
+  "mastodon.py",
+]
+
+[project.urls]
+Documentation = "https://github.com/unknown/watcher#readme"
+Issues = "https://github.com/unknown/watcher/issues"
+Source = "https://github.com/unknown/watcher"
+
+[project.scripts]
+watcher = "watcher.cli:watcher"
+
+[tool.hatch.version]
+path = "src/watcher/__about__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+  "pytest-mock",
+  "requests-mock",
+]
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+  "- coverage combine",
+  "coverage report",
+]
+cov = [
+  "test-cov",
+  "cov-report",
+]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.types]
+dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/watcher tests}"
+
+[tool.coverage.run]
+source_pkgs = ["watcher", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/watcher/__about__.py",
+]
+
+[tool.coverage.paths]
+watcher = ["src/watcher", "*/watcher/src/watcher"]
+tests = ["tests", "*/watcher/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]

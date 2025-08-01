@@ -1,4 +1,3 @@
-
 ![](https://raw.githubusercontent.com/Wytamma/glasscandle/refs/heads/main/docs/images/logo.png)
 
 A flexible, modular version monitoring tool that tracks changes across multiple sources including PyPI, Conda channels (conda-forge, bioconda, custom), and arbitrary URLs.
@@ -21,6 +20,7 @@ A flexible, modular version monitoring tool that tracks changes across multiple 
   - [PyPI](#pypi)
   - [Conda](#conda)
   - [Bioconda](#bioconda)
+  - [Conda-forge](#conda-forge)
   - [Version Constraints](#version-constraints)
 - [Usage Examples](#usage-examples)
 - [License](#license)
@@ -123,6 +123,17 @@ watch.bioconda("package-name")
 # With version constraints
 watch.bioconda("samtools", version=">=1.15")
 watch.bioconda("blast", version="~=2.12.0")
+```
+
+### Conda-forge
+Monitor packages specifically from the conda-forge channel:
+```python
+# Monitor any version from conda-forge
+watch.condaforge("numpy")
+
+# With version constraints
+watch.condaforge("scipy", version=">=1.7,<2.0")
+watch.condaforge("matplotlib", version="~=3.5.0")
 ```
 
 ### Version Constraints

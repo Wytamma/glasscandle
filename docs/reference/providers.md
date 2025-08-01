@@ -2,6 +2,8 @@
 
 ::: src.glasscandle.providers.bioconda
 
+::: src.glasscandle.providers.condaforge
+
 ::: src.glasscandle.providers.url
 
 ::: src.glasscandle.providers.pypi

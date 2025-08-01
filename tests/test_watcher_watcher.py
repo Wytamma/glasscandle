@@ -4,7 +4,7 @@ from glasscandle.watcher import Watcher
 
 @pytest.fixture
 def watcher():
-    return Watcher()
+    return Watcher("test_watcher.json")
 
 
 def test_init(watcher):
@@ -147,3 +147,12 @@ def test__wrap(watcher):
     d = {"test_key": "test_value"}
     wrapped_d = watcher._wrap(d)
     assert wrapped_d == d
+
+
+def test_condaforge(watcher):
+    def on_change(key, old_version, new_version):
+        pass
+
+    watcher.condaforge("test_package", on_change=on_change)
+    assert "test_package" in watcher.pool.condaforge
+    assert watcher.pool.condaforge["test_package"].on_change == on_change

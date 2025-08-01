@@ -13,7 +13,7 @@ from .http import create_session, HTTP_TIMEOUT
 from .notifications import _call_notifiers
 from .parsers import regex, jsonpath
 from .pool import Pool, CustomFunc
-from .providers import Provider, BiocondaProvider, CondaProvider, PyPIProvider, URLProvider
+from .providers import Provider, BiocondaProvider, CondaProvider, CondaForgeProvider, PyPIProvider, URLProvider
 
 # Type alias for notification callbacks
 NotifierCallback = Union[Callable[[str, str, str], None], List[Callable[[str, str, str], None]]]
@@ -23,7 +23,7 @@ class Watcher:
     """Main watcher class for tracking version changes across different providers.
     
     Args:
-        db: Optional path to the JSON database file (default: None uses in-memory storage)
+        db: Path to the JSON database file
         allowed_custom_domains: Tuple of allowed domains for custom URL monitoring
         conda_channels: Default conda channels to search (default: ["conda-forge", "bioconda"])
         on_change: Default callback function(s) called when version changes occur
@@ -31,14 +31,14 @@ class Watcher:
                           or a list of functions. Each receives (key, old_version, new_version).
     """
     
-    def __init__(self, db: Optional[Path] = None, allowed_custom_domains: Tuple[str, ...] = (), 
+    def __init__(self, db: Path, allowed_custom_domains: Tuple[str, ...] = (), 
                  conda_channels: Optional[List[str]] = None, 
                  on_change: Optional[NotifierCallback] = None):
         """
         Main watcher class for tracking version changes across different providers.
 
         Args:
-          db (Optional[Path]): Optional path to the JSON database file (default: None uses in-memory storage)
+          db (Path): Path to the JSON database file
           allowed_custom_domains (Tuple[str, ...]): Tuple of allowed domains for custom URL monitoring
           conda_channels (Optional[List[str]]): Default conda channels to search (default: ["conda-forge", "bioconda"])
           on_change (Optional[NotifierCallback]): Default callback function(s) called when version changes occur
@@ -239,6 +239,7 @@ class Watcher:
         providers: Tuple[Tuple[Dict[str, Provider], Provider], ...] = (
             (self._wrap(self.pool.bioconda), BiocondaProvider()),
             (self._wrap(self.pool.conda), CondaProvider()),
+            (self._wrap(self.pool.condaforge), CondaForgeProvider()),
             (self._wrap(self.pool.pypi), PyPIProvider()),
             (self._wrap(self.pool.url), URLProvider()),  # proto only for .name
         )
@@ -289,4 +290,27 @@ class Watcher:
         # If callers added raw names, convert to provider instances
         # In our registrations we already store instances, so this is no-op.
         return d
+
+    def condaforge(self, name: str, *, version: Optional[str] = None,
+                   on_change: Optional[NotifierCallback] = None) -> None:
+        """Register a conda-forge package for monitoring.
+        
+        Args:
+            name: Package name to monitor
+            version: Optional version constraint (e.g., ">=1.21,<2", "~=1.21"). 
+                    Only versions matching this constraint will trigger updates.
+            on_change: Optional callback function(s) called when version changes.
+                      Can be a single function or list of functions.
+                      Each receives (key, old_version, new_version) as arguments.
+                      
+        Examples:
+            # Monitor any version updates
+            watcher.condaforge("numpy")
+            
+            # Only update for versions >= 1.21 but < 2.0
+            watcher.condaforge("numpy", version=">=1.21,<2")
+        """
+        provider = CondaForgeProvider(version_constraint=version)
+        provider.on_change = on_change
+        self.pool.condaforge[name] = provider
 

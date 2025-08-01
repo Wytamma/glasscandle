@@ -21,7 +21,8 @@ class DB:
         """
         Initializes the DB object by creating the database file if it doesn't exist and loading the data from the file.
         """
-        if not self.path:
+        if self.path is None:
+            # use in-memory database if no path is provided
             return None
         self.path = Path(self.path)
         if not self.path.exists():
@@ -107,8 +108,8 @@ class DB:
         """
         def wrapper(self, *args, **kwargs):
             """
-        Wrapper function for transaction management. Loads data before executing the function, saves data after execution, and returns the result.
-        """
+            Wrapper function for transaction management. Loads data before executing the function, saves data after execution, and returns the result.
+            """
             self._load()
             res = func(self, *args, **kwargs)
             self._save()

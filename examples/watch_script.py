@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 """
-Version watcher script for GitHub Actions.
-
-This script is designed to run in CI/CD environments and uses environment
+Version watcher script for GitH    # Python packages - all use default callback
+    watch.pypi("requests")
+    watch.pypi("fastapi", version=">=0.100,<1.0")  # Only update within 0.x series
+    watch.pypi("django", version=">=4.0,<5.0")     # Only update within 4.x series
+    watch.pypi("flask")
+    
+    # Bioconda packages - all use default callback (legacy method)
+    watch.bioconda("samtools", version=">=1.15,<2.0")  # Avoid major version 2
+    watch.bioconda("bwa")
+    watch.bioconda("blast")
+    
+    # Conda packages with new provider - all use default callback  
+    watch.conda("bowtie2")  # searches default channels: conda-forge, bioconda
+    watch.conda("minimap2", channels=["bioconda"])  # searches only bioconda
+    watch.conda("bioconda::seqtk", version="~=1.3")  # explicit channel, compatible releaseis script is designed to run in CI/CD environments and uses environment
 variables for all sensitive configuration.
 
 Required environment variables:
@@ -58,19 +70,19 @@ def main():
     
     # Python packages - all use default callback
     watch.pypi("requests")
-    watch.pypi("fastapi")
-    watch.pypi("django")
+    watch.pypi("fastapi", version=">=0.100,<1.0")  # Only update within 0.x series
+    watch.pypi("django", version=">=4.0,<5.0")     # Only update within 4.x series
     watch.pypi("flask")
     
     # Bioconda packages - all use default callback (legacy method)
-    watch.bioconda("samtools")
+    watch.bioconda("samtools", version=">=1.15,<2.0")  # Avoid major version 2
     watch.bioconda("bwa")
     watch.bioconda("blast")
     
     # Conda packages with new provider - all use default callback  
-    watch.conda("python")  # searches default channels: conda-forge, bioconda
+    watch.conda("bowtie2")  # searches default channels: conda-forge, bioconda
     watch.conda("minimap2", channels=["bioconda"])  # searches only bioconda
-    watch.conda("bioconda::seqtk")  # explicit channel specification
+    watch.conda("bioconda::seqtk", version="~=1.3")  # explicit channel, compatible release
     
     # GitHub releases (JSON API) - all use default callback
     watch.json(

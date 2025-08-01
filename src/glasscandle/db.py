@@ -14,7 +14,7 @@ class DB:
       rollback_key (Optional[str]): The key to rollback in case of an error.
     """
     path: Optional[Path] = None
-    db: dict = field(default_factory=dict)
+    data: dict = field(default_factory=dict)
     rollback_key: Optional[str] = None
 
     def __post_init__(self):
@@ -26,7 +26,7 @@ class DB:
         self.path = Path(self.path)
         if not self.path.exists():
             self._create_db()
-        if not self.db:
+        if not self.data:
             self._load()
 
     def __iter__(self):
@@ -34,7 +34,7 @@ class DB:
         Initializes the iterator for the DB object.
         """
         self.current_index = 0
-        self.keys = list(self.db.keys())
+        self.keys = list(self.data.keys())
         return self
 
     def __next__(self):
@@ -52,7 +52,7 @@ class DB:
         Creates a new database file and dumps the current database dictionary into it.
         """
         with open(self.path, "w") as f:
-            json.dump(self.db, f)
+            json.dump(self.data, f)
 
     def _load(self):
         """
@@ -62,23 +62,23 @@ class DB:
             return None
         with open(self.path) as f:
             db = json.load(f)
-            self.db = db
+            self.data = db
         # Migrate old flat structure to new hierarchical structure
         self._migrate_to_hierarchical()
 
     def _migrate_to_hierarchical(self):
         """Migrate old flat structure (provider::item) to hierarchical structure."""
         keys_to_migrate = []
-        for key in list(self.db.keys()):
-            if "::" in key and not isinstance(self.db[key], dict):
+        for key in list(self.data.keys()):
+            if "::" in key and not isinstance(self.data[key], dict):
                 keys_to_migrate.append(key)
         
         for key in keys_to_migrate:
             provider, item = key.split("::", 1)
-            value = self.db.pop(key)  # Remove old flat key
-            if provider not in self.db:
-                self.db[provider] = {}
-            self.db[provider][item] = value
+            value = self.data.pop(key)  # Remove old flat key
+            if provider not in self.data:
+                self.data[provider] = {}
+            self.data[provider][item] = value
         
         # Save the migrated structure if any changes were made
         if keys_to_migrate:
@@ -92,11 +92,11 @@ class DB:
             return None
         try:
             with open(self.path, "w") as f:
-                json.dump(self.db, f, indent=6)
+                json.dump(self.data, f, indent=6)
         except Exception as e:
             if self.rollback_key:
                 print(f"Error saving database: {e}. Rolling back key '{self.rollback_key}'.")
-                del self.db[self.rollback_key]
+                del self.data[self.rollback_key]
                 self._save()
             raise e
             
@@ -123,10 +123,10 @@ class DB:
         if "::" in key:
             # New hierarchical key format: "provider::item" -> ["provider"]["item"]
             provider, item = key.split("::", 1)
-            return self.db.get(provider, {}).get(item)
+            return self.data.get(provider, {}).get(item)
         else:
             # Support legacy flat keys for backward compatibility
-            return self.db.get(key)
+            return self.data.get(key)
 
     @transaction
     def put(self, key, data):
@@ -137,9 +137,9 @@ class DB:
         if "::" in key:
             # New hierarchical key format: "provider::item" -> ["provider"]["item"]
             provider, item = key.split("::", 1)
-            if provider not in self.db:
-                self.db[provider] = {}
-            self.db[provider][item] = data
+            if provider not in self.data:
+                self.data[provider] = {}
+            self.data[provider][item] = data
         else:
             # Fallback to flat structure for any edge cases
-            self.db[key] = data
+            self.data[key] = data

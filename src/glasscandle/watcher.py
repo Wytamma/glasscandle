@@ -53,8 +53,8 @@ class Watcher:
         self._on_change = on_change
 
     # Registration methods
-    def conda(self, name: str, channels: Optional[List[str]] = None, 
-             on_change: Optional[NotifierCallback] = None, **kwargs) -> None:
+    def conda(self, name: str, *, channels: Optional[List[str]] = None, 
+             on_change: Optional[NotifierCallback] = None) -> None:
         """Register a conda package for monitoring across multiple channels.
         
         Args:
@@ -83,7 +83,7 @@ class Watcher:
         provider.on_change = on_change
         self.pool.conda[name] = provider
 
-    def bioconda(self, name: str, on_change: Optional[NotifierCallback] = None, **kwargs) -> None:
+    def bioconda(self, name: str, *, on_change: Optional[NotifierCallback] = None) -> None:
         """Register a bioconda package for monitoring.
         
         Args:
@@ -96,7 +96,7 @@ class Watcher:
         provider.on_change = on_change
         self.pool.bioconda[name] = provider
 
-    def pypi(self, name: str, on_change: Optional[NotifierCallback] = None, **kwargs) -> None:
+    def pypi(self, name: str, *, on_change: Optional[NotifierCallback] = None) -> None:
         """Register a PyPI package for monitoring.
         
         Args:
@@ -135,7 +135,7 @@ class Watcher:
         prov._validate(url)
         self.pool.url[url] = prov
 
-    def url_regex(self, url: str, pattern: str, group: int = 1, 
+    def url_regex(self, url: str, pattern: str, *, group: int = 1, 
                   on_change: Optional[NotifierCallback] = None, **kwargs) -> None:
         """Register a URL with a regex parser.
         
@@ -182,12 +182,12 @@ class Watcher:
         self.url(url, parser=jsonpath(path), on_change=on_change, **kwargs)
 
     # Core functionality
-    def _update(self, key: str, new_value: str, on_change: Optional[NotifierCallback] = None) -> None:
+    def _update(self, key: str, new_value: str, on_change: Optional[NotifierCallback] = None) -> bool:
         """Update a value in the database if it has changed."""
         old_value = self.db.get(key)
         if old_value == new_value:
             print(f"Skipping {key} as it is up to date.")
-            return
+            return False  # No update needed
         print(f"Updating {key}: {old_value} -> {new_value}")
         self.db.put(key, new_value)
         
@@ -200,8 +200,9 @@ class Watcher:
                 _call_notifiers(callback, key, old_value or "", new_value)
             except Exception as e:
                 print(f"[WARN] on_change callback for {key} failed: {e}")
+        return True  # Update was successful
 
-    def run(self, warn=False) -> None:
+    def run(self, warn=False) -> bool:
         """Run a single check of all registered providers."""
         providers: Tuple[Tuple[Dict[str, Provider], Provider], ...] = (
             (self._wrap(self.pool.bioconda), BiocondaProvider()),
@@ -210,12 +211,14 @@ class Watcher:
             (self._wrap(self.pool.url), URLProvider()),  # proto only for .name
         )
 
+        updated = False
         for items_map, proto in providers:
             for item, provider in items_map.items():
                 try:
                     version = provider.fetch_version(item, self._session)
                     on_change = getattr(provider, 'on_change', None)
-                    self._update(provider.key(item), version, on_change)
+                    if self._update(provider.key(item), version, on_change):
+                        updated = True
                 except (requests.RequestException, ValueError, json.JSONDecodeError) as e:
                     if warn:
                         print(f"[WARN] {proto.name}:{item} failed: {e}")
@@ -230,13 +233,15 @@ class Watcher:
                     raise ValueError(f"{url} returned {res.status_code}")
                 result = func(res)
                 on_change = self.pool.custom_callbacks.get(url)
-                self._update(f"url::{url}", result, on_change)
+                if self._update(f"url::{url}", result, on_change):
+                    updated = True
             except (requests.RequestException, ValueError) as e:
                 if warn:
                     print(f"[WARN] custom:{url} failed: {e}")
                 else:
                     raise ValueError(f"Failed to fetch custom URL {url}: {e}")
-
+        return updated
+    
     def start(self, interval: int = 60) -> None:
         """Start continuous monitoring with the specified interval."""
         try:

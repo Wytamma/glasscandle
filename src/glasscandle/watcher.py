@@ -54,6 +54,7 @@ class Watcher:
 
     # Registration methods
     def conda(self, name: str, *, channels: Optional[List[str]] = None, 
+             version: Optional[str] = None,
              on_change: Optional[NotifierCallback] = None) -> None:
         """Register a conda package for monitoring across multiple channels.
         
@@ -61,6 +62,8 @@ class Watcher:
             name: Package name to monitor. Can include channel prefix (e.g., "bioconda::samtools")
             channels: Optional list of channels to search. If None, uses default channels.
                      Ignored if name includes channel prefix.
+            version: Optional version constraint (e.g., ">=1.21,<2", "~=1.21"). 
+                    Only versions matching this constraint will trigger updates.
             on_change: Optional callback function(s) called when version changes.
                       Can be a single function or list of functions.
                       Each receives (key, old_version, new_version) as arguments.
@@ -74,38 +77,67 @@ class Watcher:
             
             # Use channel prefix (ignores channels parameter)
             watcher.conda("bioconda::samtools")
+            
+            # Only update for versions >= 1.21 but < 2.0
+            watcher.conda("numpy", version=">=1.21,<2")
+            
+            # Compatible release constraint (1.21.x series only)
+            watcher.conda("scipy", version="~=1.21")
         """
         # Use provided channels, or fall back to instance default, or global default
         if channels is None:
             channels = self._conda_channels
         
-        provider = CondaProvider(channels=channels)
+        provider = CondaProvider(channels=channels, version_constraint=version)
         provider.on_change = on_change
         self.pool.conda[name] = provider
 
-    def bioconda(self, name: str, *, on_change: Optional[NotifierCallback] = None) -> None:
+    def bioconda(self, name: str, *, version: Optional[str] = None,
+                 on_change: Optional[NotifierCallback] = None) -> None:
         """Register a bioconda package for monitoring.
         
         Args:
             name: Package name to monitor
+            version: Optional version constraint (e.g., ">=1.21,<2", "~=1.21"). 
+                    Only versions matching this constraint will trigger updates.
             on_change: Optional callback function(s) called when version changes.
                       Can be a single function or list of functions.
                       Each receives (key, old_version, new_version) as arguments.
+                      
+        Examples:
+            # Monitor any version updates
+            watcher.bioconda("samtools")
+            
+            # Only update for versions >= 1.15 but < 2.0
+            watcher.bioconda("samtools", version=">=1.15,<2")
         """
-        provider = BiocondaProvider()
+        provider = BiocondaProvider(version_constraint=version)
         provider.on_change = on_change
         self.pool.bioconda[name] = provider
 
-    def pypi(self, name: str, *, on_change: Optional[NotifierCallback] = None) -> None:
+    def pypi(self, name: str, *, version: Optional[str] = None, 
+             on_change: Optional[NotifierCallback] = None) -> None:
         """Register a PyPI package for monitoring.
         
         Args:
             name: Package name to monitor
+            version: Optional version constraint (e.g., ">=1.21,<2", "~=1.21"). 
+                    Only versions matching this constraint will trigger updates.
             on_change: Optional callback function(s) called when version changes.
                       Can be a single function or list of functions.
                       Each receives (key, old_version, new_version) as arguments.
+                      
+        Examples:
+            # Monitor any version updates
+            watcher.pypi("requests")
+            
+            # Only update for versions >= 2.25 but < 3.0
+            watcher.pypi("requests", version=">=2.25,<3")
+            
+            # Compatible release constraint (2.25.x series only)
+            watcher.pypi("requests", version="~=2.25")
         """
-        provider = PyPIProvider()
+        provider = PyPIProvider(version_constraint=version)
         provider.on_change = on_change
         self.pool.pypi[name] = provider
     

@@ -49,6 +49,7 @@ class BiocondaProvider(CondaProvider):
           "1.0.0"
     """
     name: str = "bioconda"
+    version_constraint: Optional[str] = None
     on_change: Optional[Callable[[str, str, str], None]] = None
 
     def __post_init__(self):

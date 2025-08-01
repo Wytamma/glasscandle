@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="138.626 164.988 310.177 136.18" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0ea5e9"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="223.196" y1="156.962" x2="223.196" y2="178.42" id="gradient-0" gradientTransform="matrix(0.63751, -0.770443, 2.600923, 2.152166, -353.19504, -23.228853)">
+      <stop offset="0" style="stop-color: rgb(45, 81, 115);"/>
+      <stop offset="1" style="stop-color: rgb(8.382% 15.68% 22.273%)"/>
+    </linearGradient>
+    <bx:export>
+      <bx:file format="png" path="glasscandle logo.png" dpi="400" width="600" height="263"/>
+    </bx:export>
+  </defs>
+  <title>glasscandle logo</title>
+  <g transform="matrix(0.882569, 0, 0, 0.907533, -10.017608, 132.442093)" style="">
+    <ellipse style="stroke-linecap: round; fill: url(&quot;#gradient-0&quot;); stroke-width: 3px;" cx="223.196" cy="167.691" rx="43.563" ry="10.729"/>
+    <path d="M 223.196 48.215 L 259.196 70.215 L 259.196 142.215 L 223.196 164.215 L 187.196 142.215 L 187.196 70.215 L 223.196 48.215 Z" fill="none" stroke="url(#g)" stroke-width="8" stroke-linejoin="round" style="stroke-width: 8;"/>
+    <path d="M 223.196 60.215 L 249.196 76.215 L 249.196 136.215 L 223.196 152.215 L 197.196 136.215 L 197.196 76.215 L 223.196 60.215 Z" fill="none" stroke="url(#g)" stroke-width="6" opacity="0.45" stroke-linejoin="round" style="stroke-width: 6;"/>
+    <path d="M 223.196 86.215 C 231.196 96.215 235.196 103.215 235.196 110.215 C 235.196 120.215 229.196 128.215 223.196 128.215 C 217.196 128.215 211.196 120.215 211.196 110.215 C 211.196 103.215 215.196 96.215 223.196 86.215 Z" style="stroke-width: 1;" fill="url(#g)"/>
+  </g>
+  <text style="fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 66px; font-weight: 700; stroke: rgb(236, 240, 241); stroke-width: 2.02363px; white-space: pre;" transform="matrix(0.987274, 0, 0, 0.989368, 190.789291, -0.843077)"><tspan x="36.551" y="227.85">Glass</tspan><tspan x="36.551" dy="1em">​</tspan><tspan>Candle</tspan></text>
+</svg>

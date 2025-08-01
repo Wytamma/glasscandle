@@ -29,7 +29,7 @@ class VersionConstraint:
     
     def _parse_constraints(self) -> List[tuple]:
         """Parse constraint string into list of (operator, version) tuples."""
-        if not self.constraint_string:
+        if not self.constraint_string or self.constraint_string == "*":
             return []
         
         constraints = []

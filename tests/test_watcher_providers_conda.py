@@ -278,3 +278,64 @@ class TestCondaProviderIntegration:
         provider = CondaProvider(name="my-conda")
         assert provider.name == "my-conda"
         assert provider.key("samtools") == "my-conda::samtools"
+
+
+class TestCondaProviderVersionConstraints:
+    """Test conda provider with version constraints."""
+    
+    def test_conda_provider_with_version_constraint(self):
+        """Test CondaProvider with version constraint."""
+        provider = CondaProvider(version_constraint=">=1.15,<2.0")
+        assert provider.version_constraint == ">=1.15,<2.0"
+    
+    def test_fetch_version_with_constraint_match(self, requests_mock):
+        """Test fetch version with constraint that matches available versions."""
+        provider = CondaProvider(channels=["bioconda"], version_constraint=">=1.15,<2.0")
+        
+        requests_mock.get(
+            "https://api.anaconda.org/package/bioconda/samtools",
+            json={
+                "versions": ["1.10", "1.15", "1.16", "1.17", "2.0", "2.1"],
+                "latest_version": "2.1"
+            },
+        )
+        
+        version = provider.fetch_version("samtools", requests.Session())
+        assert version == "1.17"  # Latest version that matches constraint
+    
+    def test_fetch_version_with_constraint_no_match(self, requests_mock):
+        """Test fetch version with constraint that matches no available versions."""
+        provider = CondaProvider(channels=["bioconda"], version_constraint=">=3.0")
+        
+        requests_mock.get(
+            "https://api.anaconda.org/package/bioconda/samtools",
+            json={
+                "versions": ["1.10", "1.15", "1.16", "1.17", "2.0", "2.1"],
+                "latest_version": "2.1"
+            },
+        )
+        
+        with pytest.raises(ValueError, match="No versions for samtools.*match constraint"):
+            provider.fetch_version("samtools", requests.Session())
+    
+    def test_fetch_version_invalid_constraint(self):
+        """Test fetch version with invalid version constraint."""
+        provider = CondaProvider(version_constraint="invalid>=1.0")
+        
+        with pytest.raises(ValueError, match="Invalid version constraint"):
+            provider.fetch_version("samtools", requests.Session())
+    
+    def test_fetch_version_no_constraint(self, requests_mock):
+        """Test fetch version without constraint uses latest_version."""
+        provider = CondaProvider(channels=["bioconda"])
+        
+        requests_mock.get(
+            "https://api.anaconda.org/package/bioconda/samtools",
+            json={
+                "versions": ["1.10", "1.15", "1.16", "1.17"],
+                "latest_version": "1.17"
+            },
+        )
+        
+        version = provider.fetch_version("samtools", requests.Session())
+        assert version == "1.17"

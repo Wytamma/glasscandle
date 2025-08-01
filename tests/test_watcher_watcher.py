@@ -3,8 +3,13 @@ from glasscandle.watcher import Watcher
 
 
 @pytest.fixture
-def watcher():
-    return Watcher("test_watcher.json")
+def db_file(tmp_path):
+    db_path = tmp_path / "test_db.json"
+    return str(db_path)
+
+@pytest.fixture
+def watcher(db_file):
+    return Watcher(db_file)
 
 
 def test_init(watcher):

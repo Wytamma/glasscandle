@@ -13,10 +13,9 @@ nav:
     - Parsers: reference/parsers.md
     - Pool: reference/pool.md
     - Providers: reference/providers.md
+    - Version Constraints: reference/version_constraints.md
     - Notifications: reference/notifications.md
     - CLI: reference/cli.md
-    - Providers: reference/providers.md
-    - Notifications: reference/notifications.md
 
 theme:
   name: "material"

@@ -1,3 +1,5 @@
+::: src.glasscandle.providers.conda
+
 ::: src.glasscandle.providers.bioconda
 
 ::: src.glasscandle.providers.url

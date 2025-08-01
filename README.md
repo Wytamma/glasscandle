@@ -1,7 +1,7 @@
 
 ![](https://raw.githubusercontent.com/Wytamma/glasscandle/refs/heads/main/docs/images/logo.png)
 
-A flexible, modular version monitoring tool that tracks changes across multiple sources including PyPI, Bioconda, and custom URLs.
+A flexible, modular version monitoring tool that tracks changes across multiple sources including PyPI, Conda channels (conda-forge, bioconda, custom), and arbitrary URLs.
 
 [![PyPI - Version](https://img.shields.io/pypi/v/glasscandle.svg)](https://pypi.org/project/glasscandle)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/glasscandle.svg)](https://pypi.org/project/glasscandle)
@@ -18,12 +18,17 @@ A flexible, modular version monitoring tool that tracks changes across multiple 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Supported Providers](#supported-providers)
+  - [PyPI](#pypi)
+  - [Conda](#conda)
+  - [Bioconda](#bioconda)
+  - [Version Constraints](#version-constraints)
 - [Usage Examples](#usage-examples)
 - [License](#license)
 
 ## Features
 
-- 🔍 **Multi-source monitoring** - Track versions from PyPI, Bioconda, and arbitrary URLs
+- 🔍 **Multi-source monitoring** - Track versions from PyPI, Conda, Bioconda, and arbitrary URLs
+- 📏 **Version constraints** - Monitor only versions matching specific criteria (e.g., ">=1.21,<2.0")
 - 🎯 **Flexible parsing** - Built-in parsers for common formats (ETag, regex, JSON)
 - 🔧 **Custom parsers** - Write your own parsers for specialized sources
 - 💾 **Persistent storage** - JSON-based database to track version changes
@@ -53,9 +58,18 @@ def on_version_change(key: str, old: str, new: str):
 watch.pypi("requests", on_change=on_version_change)
 watch.pypi("numpy")
 
+# Monitor Conda packages from any channel
+watch.conda("pytorch", channels=["pytorch", "conda-forge"])
+watch.conda("tensorflow")  # Uses default channels
+
 # Monitor Bioconda packages
 watch.bioconda("samtools", on_change=on_version_change)
 watch.bioconda("bwa")
+
+# Monitor with version constraints
+watch.pypi("django", version=">=4.0,<5.0", on_change=on_version_change)
+watch.conda("numpy", version=">=1.21", channels=["conda-forge"])
+watch.bioconda("blast", version="~=2.12.0")
 
 # Monitor a URL with ETag parsing (default)
 watch.url("https://example.com/releases/latest")
@@ -80,12 +94,58 @@ watch.start(interval=60)
 Monitor Python packages from the Python Package Index:
 ```python
 watch.pypi("package-name")
+
+# With version constraints
+watch.pypi("django", version=">=4.0,<5.0")
+watch.pypi("requests", version="~=2.28.0")  # Compatible release
+```
+
+### Conda
+Monitor packages from Conda channels with full flexibility:
+```python
+# Monitor from default channels (conda-forge, defaults)
+watch.conda("numpy")
+
+# Monitor from specific channels
+watch.conda("pytorch", channels=["pytorch", "conda-forge"])
+watch.conda("tensorflow-gpu", channels=["conda-forge"])
+
+# With version constraints
+watch.conda("numpy", version=">=1.21,<2.0", channels=["conda-forge"])
+watch.conda("scipy", version="~=1.9.0")  # Compatible release
 ```
 
 ### Bioconda
 Monitor bioinformatics packages from Bioconda:
 ```python
 watch.bioconda("package-name")
+
+# With version constraints
+watch.bioconda("samtools", version=">=1.15")
+watch.bioconda("blast", version="~=2.12.0")
+```
+
+### Version Constraints
+All package providers support version constraints using standard Python packaging syntax:
+
+```python
+# Greater than or equal to
+watch.pypi("django", version=">=4.0")
+
+# Range constraints
+watch.conda("numpy", version=">=1.21,<2.0")
+
+# Compatible release (equivalent to >=1.21.0,<1.22.0)
+watch.bioconda("blast", version="~=1.21.0")
+
+# Exact version
+watch.pypi("requests", version="==2.28.1")
+
+# Not equal to
+watch.conda("scipy", version=">=1.9,!=1.9.2")
+
+# Complex constraints
+watch.pypi("flask", version=">2.0,!=2.1.0,<3.0")
 ```
 
 ### JSON APIs
@@ -143,6 +203,7 @@ def notify_change(key: str, old_version: str, new_version: str):
 
 # Add callbacks to any provider
 watch.pypi("requests", on_change=notify_change)
+watch.conda("numpy", version=">=1.21", on_change=notify_change)
 watch.bioconda("samtools", on_change=notify_change)
 watch.json("https://api.github.com/repos/user/repo/releases/latest", "$.tag_name", on_change=notify_change)
 watch.url("https://example.com/version", on_change=notify_change)
@@ -161,11 +222,11 @@ from glasscandle.notifications import slack_notifier, multi_notifier
 
 # Slack notifications (uses SLACK_WEBHOOK_URL env var)
 slack_notify = slack_notifier()
-watch.pypi("django", on_change=slack_notify)
+watch.pypi("django", version=">=4.0", on_change=slack_notify)
 
 # Email notifications (uses EMAIL_* env vars)  
 email_notify = email_notifier()
-watch.bioconda("samtools", on_change=email_notify)
+watch.conda("numpy", version=">=1.21", on_change=email_notify)
 
 # Multiple notification methods
 multi_notify = multi_notifier(slack_notify, email_notify)
@@ -251,10 +312,32 @@ watch = Watcher("my-versions.json")
 
 # Add packages to monitor
 watch.pypi("django")
-watch.pypi("flask")
-watch.bioconda("blast")
+watch.pypi("flask", version=">=2.0")
+watch.conda("numpy", channels=["conda-forge"])
+watch.bioconda("blast", version="~=2.12.0")
 
 # Check once
+watch.run()
+```
+
+### Version Constraint Examples
+```python
+from glasscandle import Watcher
+
+watch = Watcher("versions.json")
+
+# Monitor only major version 4.x of Django
+watch.pypi("django", version=">=4.0,<5.0")
+
+# Monitor compatible releases (patch-level updates)
+watch.conda("numpy", version="~=1.21.0")
+
+# Complex constraints with exclusions
+watch.pypi("requests", version=">=2.28,!=2.28.2,<3.0")
+
+# Monitor latest of any version (default behavior)
+watch.bioconda("samtools")
+
 watch.run()
 ```
 
@@ -282,9 +365,10 @@ from glasscandle import Watcher
 
 watch = Watcher("versions.json")
 
-# Add your packages
-watch.pypi("requests")
-watch.bioconda("samtools")
+# Add your packages with constraints
+watch.pypi("requests", version=">=2.28,<3.0")
+watch.conda("pytorch", channels=["pytorch"], version=">=1.12")
+watch.bioconda("samtools", version=">=1.15")
 watch.json("https://api.github.com/repos/user/repo/releases/latest", "$.tag_name")
 
 # Start monitoring (checks every 5 minutes)

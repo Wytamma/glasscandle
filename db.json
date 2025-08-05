@@ -6,6 +6,6 @@
             "requests": "2.32.4"
       },
       "url": {
-            "https://api.github.com/repos/wytamma/gisaidr/releases/latest": "v0.9.10"
+            "https://api.github.com/repos/wytamma/gisaidr/releases/latest": "v0.9.11"
       }
 }

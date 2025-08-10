@@ -24,7 +24,7 @@ def main():
     
     print("📦 Setting up conda package monitoring...")
     
-    # Default channel monitoring (conda-forge, defaults)
+    # Default channel monitoring (conda-forge, bioconda)
     print("\n🔧 Monitoring from default channels:")
     watch.conda("numpy")
     watch.conda("scipy")

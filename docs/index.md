@@ -103,7 +103,7 @@ watch.pypi("requests", version="~=2.28.0")  # Compatible release
 ### Conda
 Monitor packages from Conda channels with full flexibility:
 ```python
-# Monitor from default channels (conda-forge, defaults)
+# Monitor from default channels (conda-forge, bioconda)
 watch.conda("numpy")
 
 # Monitor from specific channels
